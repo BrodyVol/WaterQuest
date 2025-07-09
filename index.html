@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Water Quest</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Water Quest</h1>
+    <p class="game-instructions">Collect The Most Cans!!</p>
+    <div class="stats">
+      <p>Cans Collected: <span id="current-cans">0</span></p>
+      <p>High Score: <span id="high-score">0</span></p>
+      <p>Time Left: <span id="timer">30</span>s</p>
+    </div>
+    <div id="achievements" class="achievement"></div>
+    <div id="gameover-modal" class="gameover-modal" style="display:none;">
+      <div class="gameover-content">
+        <h2>Game Over!</h2>
+        <div id="confetti-container"></div>
+        <p id="final-score-msg"></p>
+        <p id="highscore-msg" style="font-weight:bold;color:#2E9DF7;"></p>
+        <p id="congrats-msg" style="font-size:1.2em;color:#4FCB53;"></p>
+        <button id="try-again">Try Again</button>
+      </div>
+    </div>
+    <div class="game-grid"></div>
+    <button id="start-game">Start Game</button>
+    <button id="reset-game" class="corner-btn">Reset Game</button>
+    <button id="reset-all" class="corner-btn reset-all">Clear High Score</button>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
