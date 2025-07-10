@@ -25,9 +25,41 @@ const GOAL_CANS = 25;        // Total items needed to collect
 let currentCans = 0;         // Current number of items collected
 let highScore = 0;           // Highest score across all games
 let gameActive = false;      // Tracks if game is currently running
-let spawnInterval;          // Holds the interval for spawning items
-let timerInterval;          // Holds the interval for the timer
-let timeLeft = 30;          // Time left in seconds
+let spawnInterval;           // Holds the interval for spawning items
+let timerInterval;           // Holds the interval for the timer
+let timeLeft = 30;           // Time left in seconds
+
+// Difficulty settings
+let currentDifficulty = 'normal';
+let spawnRate = 1000; // ms
+let iconLinger = 100; // ms, how long icons stay after click
+let biohazardChance = 0.2;
+let plusChance = 0.15;
+
+function setDifficulty(diff) {
+  currentDifficulty = diff;
+  if (diff === 'easy') {
+    timeLeft = 35;
+    spawnRate = 1100; // Slower spawns (1.1s)
+    iconLinger = 1500; // Icons stay even longer (1.5s)
+    biohazardChance = 0.13;
+    plusChance = 0.27;
+  } else if (diff === 'hard') {
+    timeLeft = 25;
+    spawnRate = 600; // Icons spawn faster
+    iconLinger = 30; // Icons disappear very quickly (0.03s)
+    biohazardChance = 0.32;
+    plusChance = 0.10;
+  } else {
+    // normal
+    timeLeft = 30;
+    spawnRate = 1000;
+    iconLinger = 100;
+    biohazardChance = 0.2;
+    plusChance = 0.15;
+  }
+  document.getElementById('timer').textContent = timeLeft;
+}
 
 // Creates the 3x3 game grid where items will appear
 function createGrid() {
@@ -48,22 +80,28 @@ if (localStorage.getItem('waterquest-highscore')) {
 }
 document.getElementById('high-score').textContent = highScore;
 
-// Spawns a new item in a random grid cell (can or biohazard)
+// Spawns a new item in a random grid cell (can, biohazard, or plus)
 function spawnWaterCan() {
   if (!gameActive) return;
   const cells = document.querySelectorAll('.grid-cell');
   // Clear all cells before spawning a new item
   cells.forEach(cell => (cell.innerHTML = ''));
 
-  // Decide if this spawn is a biohazard (20% chance)
-  const isBiohazard = Math.random() < 0.2;
+  // Decide which icon to spawn based on difficulty
+  const rand = Math.random();
+  let iconType = 'watercan';
+  if (rand < biohazardChance) {
+    iconType = 'biohazard';
+  } else if (rand < biohazardChance + plusChance) {
+    iconType = 'plus';
+  }
   const randomCell = cells[Math.floor(Math.random() * cells.length)];
 
-  if (isBiohazard) {
+  if (iconType === 'biohazard') {
     // Insert biohazard SVG styled to match the game
     randomCell.innerHTML = `
       <div class="biohazard-wrapper">
-        <div class="biohazard" title="Biohazard -2s">
+        <div class="biohazard" title="Biohazard -3s">
           <svg viewBox="0 0 64 64" fill="none">
             <circle cx="32" cy="32" r="30" fill="#FFC907" stroke="#003366" stroke-width="3"/>
             <g stroke="#003366" stroke-width="2" stroke-linecap="round">
@@ -80,12 +118,41 @@ function spawnWaterCan() {
     if (biohazard) {
       biohazard.addEventListener('click', function handleBioClick(e) {
         if (!gameActive) return;
-        timeLeft = Math.max(0, timeLeft - 2);
+        timeLeft = Math.max(0, timeLeft - 3);
         document.getElementById('timer').textContent = timeLeft;
         biohazard.removeEventListener('click', handleBioClick);
         setTimeout(() => {
           if (biohazard.parentElement) biohazard.parentElement.remove();
-        }, 100);
+        }, iconLinger);
+      });
+    }
+  } else if (iconType === 'plus') {
+    // Insert plus icon styled to match the game
+    randomCell.innerHTML = `
+      <div class="biohazard-wrapper" style="background:#eafff0;">
+        <div class="plus-icon" title="Bonus +2s" style="width:38px;height:38px;display:block;cursor:pointer;">
+          <svg viewBox="0 0 64 64" fill="none">
+            <circle cx="32" cy="32" r="30" fill="#4FCB53" stroke="#003366" stroke-width="3"/>
+            <g>
+              <rect x="28" y="16" width="8" height="32" rx="3" fill="#fff"/>
+              <rect x="16" y="28" width="32" height="8" rx="3" fill="#fff"/>
+              <rect x="28" y="16" width="8" height="32" rx="3" fill="#159A48" fill-opacity=".18"/>
+              <rect x="16" y="28" width="32" height="8" rx="3" fill="#159A48" fill-opacity=".18"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+    `;
+    const plusIcon = randomCell.querySelector('.plus-icon');
+    if (plusIcon) {
+      plusIcon.addEventListener('click', function handlePlusClick(e) {
+        if (!gameActive) return;
+        timeLeft = Math.min(timeLeft + 2, 99); // Cap at 99s for sanity
+        document.getElementById('timer').textContent = timeLeft;
+        plusIcon.removeEventListener('click', handlePlusClick);
+        setTimeout(() => {
+          if (plusIcon.parentElement) plusIcon.parentElement.remove();
+        }, iconLinger);
       });
     }
   } else {
@@ -104,23 +171,28 @@ function spawnWaterCan() {
         waterCan.removeEventListener('click', handleClick);
         setTimeout(() => {
           if (waterCan.parentElement) waterCan.parentElement.remove();
-        }, 100);
+        }, iconLinger);
       });
     }
   }
 }
 
-// Initializes and starts a new game
+// Show difficulty modal and start game after selection
 function startGame() {
-  if (gameActive) return; // Prevent starting a new game if one is already active
+  if (gameActive) return;
+  document.getElementById('difficulty-modal').style.display = 'flex';
+}
+
+function beginGameWithDifficulty(diff) {
+  setDifficulty(diff);
   gameActive = true;
   currentCans = 0;
-  timeLeft = 30;
   document.getElementById('current-cans').textContent = currentCans;
   document.getElementById('timer').textContent = timeLeft;
   document.getElementById('gameover-modal').style.display = 'none';
-  createGrid(); // Set up the game grid
-  spawnInterval = setInterval(spawnWaterCan, 1000); // Spawn water cans every second
+  document.getElementById('difficulty-modal').style.display = 'none';
+  createGrid();
+  spawnInterval = setInterval(spawnWaterCan, spawnRate);
   timerInterval = setInterval(() => {
     if (!gameActive) return;
     timeLeft--;
@@ -205,3 +277,14 @@ document.getElementById('try-again').addEventListener('click', startGame);
 document.getElementById('reset-game').addEventListener('click', resetGameOnly);
 // Set up click handler for reset all button
 document.getElementById('reset-all').addEventListener('click', resetAll);
+
+// Difficulty modal button handlers
+document.getElementById('easy-mode').addEventListener('click', function() {
+  beginGameWithDifficulty('easy');
+});
+document.getElementById('normal-mode').addEventListener('click', function() {
+  beginGameWithDifficulty('normal');
+});
+document.getElementById('hard-mode').addEventListener('click', function() {
+  beginGameWithDifficulty('hard');
+});

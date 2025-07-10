@@ -1,3 +1,28 @@
+/* Difficulty Modal Button Colors */
+#difficulty-modal .gameover-content button#easy-mode {
+  background: #4FCB53;
+  color: #003366;
+}
+#difficulty-modal .gameover-content button#easy-mode:hover {
+  background: #159A48;
+  color: #fff;
+}
+#difficulty-modal .gameover-content button#normal-mode {
+  background: #FFC907;
+  color: #003366;
+}
+#difficulty-modal .gameover-content button#normal-mode:hover {
+  background: #2E9DF7;
+  color: #fff;
+}
+#difficulty-modal .gameover-content button#hard-mode {
+  background: #F5402C;
+  color: #fff;
+}
+#difficulty-modal .gameover-content button#hard-mode:hover {
+  background: #B71C1C;
+  color: #FFC907;
+}
 /* Corner reset buttons */
 .corner-btn {
   position: fixed;
