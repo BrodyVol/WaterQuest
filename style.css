@@ -1,3 +1,30 @@
+@keyframes burst-fade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(0.7);
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(2.2);
+  }
+}
+
+@keyframes drop-burst {
+  0% {
+    opacity: 1;
+    transform: translate(-50%,-50%) scale(0.7);
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%,-50%) scale(2.2);
+  }
+}
 /* Difficulty Modal Button Colors */
 #difficulty-modal .gameover-content button#easy-mode {
   background: #4FCB53;
@@ -27,8 +54,8 @@
 .corner-btn {
   position: fixed;
   right: 24px;
-  bottom: 24px;
-  z-index: 1200;
+  bottom: 110px; /* move above footer */
+  z-index: 2200;
   background: #FFC907;
   color: #003366;
   border: none;
@@ -47,7 +74,7 @@
 }
 .corner-btn.reset-all {
   right: 24px;
-  bottom: 70px;
+  bottom: 166px; /* stack above the other button */
   background: #FFC907;
   color: #003366;
   border: none;
@@ -59,13 +86,15 @@
 @media (max-width: 600px) {
   .corner-btn, .corner-btn.reset-all {
     right: 8px;
-    bottom: 8px;
     padding: 8px 12px;
     font-size: 13px;
     border-radius: 6px;
   }
+  .corner-btn {
+    bottom: 110px;
+  }
   .corner-btn.reset-all {
-    bottom: 48px;
+    bottom: 148px;
   }
 }
 /* Biohazard symbol style */
@@ -117,17 +146,31 @@ Fonts:
 
 */
 
+/* Proxima Nova font-face (web-safe fallback if not available) */
+@font-face {
+  font-family: 'Proxima Nova';
+  src: local('Proxima Nova'), local('ProximaNova'),
+       url('https://fonts.cdnfonts.com/s/16252/ProximaNova-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 * {
   box-sizing: border-box;
 }
 
+html, body, h1, h2, h3, h4, h5, h6, p, button, span, div, a, .stats, .game-instructions, .gameover-content, .footer, .corner-btn, .achievement {
+  font-family: 'Proxima Nova', Arial, sans-serif !important;
+}
+
 body {
-  font-family: 'Avenir', 'Proxima Nova', Arial, sans-serif;
   margin: 0;
   padding: 30px;
   background: linear-gradient(135deg, #003366 0%, #77A8BB 100%);
   color: #003366;
   min-height: 100vh;
+  padding-bottom: 110px;
 }
 
 .container {
@@ -355,6 +398,18 @@ button:hover {
 }
 
 @media (max-width: 600px) {
+  .corner-btn, .corner-btn.reset-all {
+    right: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+  }
+  .corner-btn {
+    bottom: 110px;
+  }
+  .corner-btn.reset-all {
+    bottom: 148px;
+  }
   .container {
     padding: 12px 2vw;
     border-radius: 10px;
@@ -417,4 +472,36 @@ button:hover {
     width: 30px;
     height: 30px;
   }
+}
+
+/* Footer styles */
+.footer {
+  width: 100vw;
+  min-height: 80px;
+  background: linear-gradient(90deg, #FFC907 0%, #2E9DF7 100%);
+  color: #003366;
+  font-size: 17px;
+  border-top: 3px solid #00336633;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 2000;
+  box-shadow: 0 -2px 16px #00336622;
+}
+.footer p {
+  margin: 0;
+  padding: 0;
+}
+.footer a {
+  color: #2E9DF7;
+  text-decoration: underline;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+.footer a:hover {
+  color: #159A48;
 }
